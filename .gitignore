@@ -1,6 +1,6 @@
 client_secrets.json
 tokens.json
-
+.env
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
