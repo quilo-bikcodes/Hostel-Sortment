@@ -181,106 +181,143 @@ for block in dataframe['Block No.'].tolist():
 # print("room__two:",rooms_names_2)
 # print("room__one:",rooms_names_1)
 
-def gmail_send_message():
-    """Create and send an email message
-    Print the returned  message id
-    Returns: Message object, including message id
+# If modifying these scopes, delete the file token.json.
+SCOPES = ['https://www.googleapis.com/auth/gmail.send']
 
-    Load pre-authorized user credentials from the environment.
-    TODO(developer) - See https://developers.google.com/identity
-    for guides on implementing OAuth2 for the application.
-    """
-    os.environ["GOOGLE_APPLICATION_CREDENTIALS"]= "./gmail-cred.json"
-    creds, _ = google.auth.default()
 
+# Writes gmail message
+def create_message(sender, content, subject):
+
+    msg = EmailMessage()
+   
+    # msg.set_content("Hello from Bikram")
+    msg.set_content(content)
+
+    me = "bikramjeetdasgupta@gmail.com"
+    you = sender
+    # msg['Subject'] = f'Hey Mate of Room. Here are your roommates'
+    msg['Subject'] = subject
+    msg['From'] = me
+    msg['To'] = you
+    return {'raw': base64.urlsafe_b64encode(msg.as_string().encode()).decode()}
+
+
+# Sends gmail message
+def send_message(service, user_id, message):
     try:
-        service = build('gmail', 'v1', credentials=creds)
-        message = EmailMessage()
-
-        message.set_content('This is automated draft mail')
-
-        message['To'] = "bikramjeetdg@gmail.com"
-        message['From'] = "quilo.bikcodes@gmail.com"
-        message['Subject'] = 'Automated draft'
-
-        # encoded message
-        encoded_message = base64.urlsafe_b64encode(message.as_bytes()) \
-            .decode()
-
-        create_message = {
-            'raw': encoded_message
-        }
-     
-        # pylint: disable=E1101
-        send_message = (service.users().messages().send
-                        (userId="me", body=create_message).execute())
-        print(F'Message Id: {send_message["id"]}')
+        message = (service.users().messages().send(userId=user_id, body=message).execute())
+        print('Message Id: %s' % message['id'])
+        return message
     except HttpError as error:
-        print(F'An error occurred: {error}')
-        send_message = None
-    return send_message
+        print('An error occurred: %s' % error)
 
 
-SCOPES = ['https://mail.google.com/']
-
-    
-def gmail_authenticate():
+def main():
+    """Shows basic usage of the Gmail API.
+    Lists the user's Gmail labels.
+    """
     creds = None
-    # the file token.pickle stores the user's access and refresh tokens, and is
-    # created automatically when the authorization flow completes for the first time
-    if os.path.exists("token.pickle"):
-        with open("token.pickle", "rb") as token:
-            creds = pickle.load(token)
-    # if there are no (valid) credentials availablle, let the user log in.
+    # The file token.json stores the user's access and refresh tokens, and is
+    # created automatically when the authorization flow completes for the first
+    # time.
+    if os.path.exists('token.json'):
+        creds = Credentials.from_authorized_user_file('token.json', SCOPES)
+    # If there are no (valid) credentials available, let the user log in.
     if not creds or not creds.valid:
         if creds and creds.expired and creds.refresh_token:
             creds.refresh(Request())
         else:
-            flow = InstalledAppFlow.from_client_secrets_file('credentials.json', SCOPES)
+            flow = InstalledAppFlow.from_client_secrets_file(
+                'credentials.json', SCOPES)
             creds = flow.run_local_server(port=0)
-        # save the credentials for the next run
-        with open("token.pickle", "wb") as token:
-            pickle.dump(creds, token)
-    return build('gmail', 'v1', credentials=creds)
+        # Save the credentials for the next run
+        with open('token.json', 'w') as token:
+            token.write(creds.to_json())
 
-# get the Gmail API service
-service = gmail_authenticate()
+    service = build('gmail', 'v1', credentials=creds)
+
+    msg = create_message()
+    send_message(service, 'me', msg)
 
 
-gmail_send_message()
+
 for email in dataframe['Email Address'].tolist():
+
+    creds = None
+    # The file token.json stores the user's access and refresh tokens, and is
+    # created automatically when the authorization flow completes for the first
+    # time.
+    if os.path.exists('token.json'):
+        creds = Credentials.from_authorized_user_file('token.json', SCOPES)
+    # If there are no (valid) credentials available, let the user log in.
+    if not creds or not creds.valid:
+        if creds and creds.expired and creds.refresh_token:
+            creds.refresh(Request())
+        else:
+            flow = InstalledAppFlow.from_client_secrets_file(
+                'credentials.json', SCOPES)
+            creds = flow.run_local_server(port=0)
+        # Save the credentials for the next run
+        with open('token.json', 'w') as token:
+            token.write(creds.to_json())
+    service = build('gmail', 'v1', credentials=creds)
+
+   
+    
+
+    
+
     df2 = dataframe.loc[dataframe['Email Address'] == email].head()
     blklist = df2['Block No.'].tolist()
     blockno = ''.join([str(element) for element in blklist]) 
     # print(blockno)
     if blockno == '2':
         roomlist = df2['Room No. '].tolist()
-
+        
         roomno = ''.join([str(element) for element in roomlist]) 
         # print(room_dict_2[roomno])
     # print(str(email))
 
-
-
+        sender = "quilo.bikcodes@gmail.com"
+        context = "So these are your roommates:"
+        for i in room_dict_2[roomno][0]:
+            context = context + "\n" + i
+        context = context + "\n\nThanks for filling the G Forms\n\n\n\nFrom the operator \nI am Bikramjeet Dasgupta \nCSE \nAI ML \nFresher\n"
+        print(context)
+        subject = f'Hey Mate of Room {roomno}. Here are your roommates'
+        msg = create_message(sender, context , subject )
+        # send_message(service, 'me', msg)        
+        break
         # msg = EmailMessage()
         # content = room_dict_2[roomno][0]
         # msg.set_content("Hello from Bikram")
 
-        # me = "bikramjeetdg@gmail.com"
+        # me = "bikramjeetdasgupta@yahoo.com"
         # you = "quilo.bikcodes@gmail.com"
         # msg['Subject'] = f'Hey Mate of Room{roomno}. Here are your roommates'
         # msg['From'] = me
         # msg['To'] = you
-        
-        # # s = smtplib.SMTP('localhost')
+
+        # # s = smtplib.SMTP('smtp.zoho.com', 465)
 
         # load_dotenv(".env")
 
         # SENDER = os.environ.get("GMAIL_USER")
         # PASSWORD = os.environ.get("GMAIL_PASSWORD")
-        # s = smtplib.SMTP_SSL("smtp.gmail.com", 587)
-        
-        # s.send_message(msg)
-        # s.quit()
+        # # s.ehlo()
+        # # s.starttls()
+        # # s.ehlo()
+        # # s = smtplib.SMTP_SSL("smtp.gmail.com", 587)
+        # session = smtplib.SMTP_SSL('smtp.zoho.com', 465)
+        # # session.starttls()
+        # session.login("bikramjeetdg@zohomail.in", "Babi1234")
+
+        # session.sendmail(me, you, msg)
+        # session.close()
+        # # s.login(SENDER,PASSWORD)
+        # # s.sendmail(SENDER, you,msg)
+        # # # s.send_message(msg)
+        # # s.quit()
         
 # https://docs.google.com/spreadsheets/d/1UCbxwVUZFdHyMQyqlNhPsJe8RJkJTvsa2v8pFXI4wpE/edit?usp=sharing
+# G6Mu*QG6FzYd9*a
