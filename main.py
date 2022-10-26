@@ -271,6 +271,7 @@ for email in dataframe['Email Address'].tolist():
         # msg['Subject'] = f'Hey Mate of Room{roomno}. Here are your roommates'
         # msg['From'] = me
         # msg['To'] = you
+        
         # # s = smtplib.SMTP('localhost')
 
         # load_dotenv(".env")
@@ -278,7 +279,7 @@ for email in dataframe['Email Address'].tolist():
         # SENDER = os.environ.get("GMAIL_USER")
         # PASSWORD = os.environ.get("GMAIL_PASSWORD")
         # s = smtplib.SMTP_SSL("smtp.gmail.com", 587)
-        # s.login(me, "Babi1234")
+        
         # s.send_message(msg)
         # s.quit()
         
