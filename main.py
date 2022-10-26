@@ -1,6 +1,7 @@
 from __future__ import print_function
 import collections
 import os
+import pickle
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
@@ -180,8 +181,73 @@ for block in dataframe['Block No.'].tolist():
 # print("room__two:",rooms_names_2)
 # print("room__one:",rooms_names_1)
 
+def gmail_send_message():
+    """Create and send an email message
+    Print the returned  message id
+    Returns: Message object, including message id
+
+    Load pre-authorized user credentials from the environment.
+    TODO(developer) - See https://developers.google.com/identity
+    for guides on implementing OAuth2 for the application.
+    """
+    os.environ["GOOGLE_APPLICATION_CREDENTIALS"]= "./gmail-cred.json"
+    creds, _ = google.auth.default()
+
+    try:
+        service = build('gmail', 'v1', credentials=creds)
+        message = EmailMessage()
+
+        message.set_content('This is automated draft mail')
+
+        message['To'] = "bikramjeetdg@gmail.com"
+        message['From'] = "quilo.bikcodes@gmail.com"
+        message['Subject'] = 'Automated draft'
+
+        # encoded message
+        encoded_message = base64.urlsafe_b64encode(message.as_bytes()) \
+            .decode()
+
+        create_message = {
+            'raw': encoded_message
+        }
+     
+        # pylint: disable=E1101
+        send_message = (service.users().messages().send
+                        (userId="me", body=create_message).execute())
+        print(F'Message Id: {send_message["id"]}')
+    except HttpError as error:
+        print(F'An error occurred: {error}')
+        send_message = None
+    return send_message
 
 
+SCOPES = ['https://mail.google.com/']
+
+    
+def gmail_authenticate():
+    creds = None
+    # the file token.pickle stores the user's access and refresh tokens, and is
+    # created automatically when the authorization flow completes for the first time
+    if os.path.exists("token.pickle"):
+        with open("token.pickle", "rb") as token:
+            creds = pickle.load(token)
+    # if there are no (valid) credentials availablle, let the user log in.
+    if not creds or not creds.valid:
+        if creds and creds.expired and creds.refresh_token:
+            creds.refresh(Request())
+        else:
+            flow = InstalledAppFlow.from_client_secrets_file('credentials.json', SCOPES)
+            creds = flow.run_local_server(port=0)
+        # save the credentials for the next run
+        with open("token.pickle", "wb") as token:
+            pickle.dump(creds, token)
+    return build('gmail', 'v1', credentials=creds)
+
+# get the Gmail API service
+service = gmail_authenticate()
+
+
+gmail_send_message()
 for email in dataframe['Email Address'].tolist():
     df2 = dataframe.loc[dataframe['Email Address'] == email].head()
     blklist = df2['Block No.'].tolist()
@@ -196,24 +262,24 @@ for email in dataframe['Email Address'].tolist():
 
 
 
-        msg = EmailMessage()
-        content = room_dict_2[roomno][0]
-        msg.set_content("Hello from Bikram")
+        # msg = EmailMessage()
+        # content = room_dict_2[roomno][0]
+        # msg.set_content("Hello from Bikram")
 
-        me = "bikramjeetdg@gmail.com"
-        you = "quilo.bikcodes@gmail.com"
-        msg['Subject'] = f'Hey Mate of Room{roomno}. Here are your roommates'
-        msg['From'] = me
-        msg['To'] = you
-        # s = smtplib.SMTP('localhost')
+        # me = "bikramjeetdg@gmail.com"
+        # you = "quilo.bikcodes@gmail.com"
+        # msg['Subject'] = f'Hey Mate of Room{roomno}. Here are your roommates'
+        # msg['From'] = me
+        # msg['To'] = you
+        # # s = smtplib.SMTP('localhost')
 
-        load_dotenv(".env")
+        # load_dotenv(".env")
 
-        SENDER = os.environ.get("GMAIL_USER")
-        PASSWORD = os.environ.get("GMAIL_PASSWORD")
-        s = smtplib.SMTP_SSL("smtp.gmail.com", 465)
-        s.login(me, "Babi1234")
-        s.send_message(msg)
-        s.quit()
+        # SENDER = os.environ.get("GMAIL_USER")
+        # PASSWORD = os.environ.get("GMAIL_PASSWORD")
+        # s = smtplib.SMTP_SSL("smtp.gmail.com", 587)
+        # s.login(me, "Babi1234")
+        # s.send_message(msg)
+        # s.quit()
         
 # https://docs.google.com/spreadsheets/d/1UCbxwVUZFdHyMQyqlNhPsJe8RJkJTvsa2v8pFXI4wpE/edit?usp=sharing

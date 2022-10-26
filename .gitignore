@@ -1,6 +1,8 @@
 client_secrets.json
 tokens.json
 .env
+credentials.json
+gmail-cred.json
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
