@@ -2,6 +2,7 @@ from __future__ import print_function
 import collections
 import os
 import pickle
+from time import sleep
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
@@ -15,7 +16,7 @@ from dotenv import load_dotenv
 # Import smtplib for the actual sending function
 import smtplib
 def line():
-    for i in range(30):
+    for i in range(100):
         print('=',end="")
     print('=')
 # Import the email modules we'll need
@@ -29,39 +30,7 @@ from email.message import EmailMessage
 import google.auth
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
-# # Open the plain text file whose name is in textfile for reading.
-# with open(textfile) as fp:
-#     # Create a text/plain message
-#     msg = EmailMessage()
-#     msg.set_content(fp.read())
 
-# # me = the sender's email address
-# # you = the recipient's email address
-# msg['Subject'] = f'The contents of {textfile}'
-# msg['From'] = me
-# msg['To'] = you
-
-# # Send the message via our own SMTP server.
-# s = smtplib.SMTP('localhost')
-# s.send_message(msg)
-# s.quit()
-
-# Initializing a GoogleAuth Object
-# gauth = GoogleAuth()
-
-# # client_secrets.json file is verified
-# # and it automatically handles authentication
-# gauth.LocalWebserverAuth()
-
-# # GoogleDrive Instance is created using
-# # authenticated GoogleAuth instance
-# drive = GoogleDrive(gauth)
-
-# # Initialize GoogleDriveFile instance with file id
-# file_obj = drive.CreateFile(
-#     {'id': '1UCbxwVUZFdHyMQyqlNhPsJe8RJkJTvsa2v8pFXI4wpE'})
-# file_obj.GetContentFile('Data Collect (Responses).xls',
-#          mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
 
 dataframe = pd.read_excel('Hostel Allocation Grouping (Responses).xlsx')
 # print(dataframe)
@@ -81,40 +50,81 @@ room_dict_1 = collections.defaultdict(list)
 room_dict_2 = collections.defaultdict(list) 
 room_dict_3 = collections.defaultdict(list) 
 room_dict_4 = collections.defaultdict(list) 
+block_1_dict = collections.defaultdict(list) 
+block_2_dict = collections.defaultdict(list) 
+block_3_dict = collections.defaultdict(list) 
+neighbors_dict_2 = collections.defaultdict(list)
+# print(dataframe['Block No.'].tolist())
+# print(dataframe['Room No. '].tolist())
 
 
 for block in dataframe['Block No.'].tolist():
+    sleep(0.001)
 
-#   print(block)
+    
     match str(block):
-        case '2':
-            df1 = dataframe.loc[dataframe['Block No.'] == block].head()
+        
+        case '2' :
+            df1 = dataframe.loc[dataframe['Block No.'] == block]
+            
             n = 0
-
+            block_2_dict[str(block)].append(df1['Name'].tolist())
+            
             for room in df1['Room No. ']:
                 # print(room)
-                df2 = df1.loc[df1['Room No. '] == room].head()
+                df2 = df1.loc[df1['Room No. '] == room]
                 if str(room) in rooms_names_2:
                     for length in range(len(rooms_names_2)):
                         if str(room) == rooms_names_2[length]:
                             if len(room_dict_2[str(room)])==0:
                                 room_dict_2[str(room)].append(df2['Name'].tolist())
-                                # print(str(room))
+                                room_dict_2[str(room)].append(df2['Branch with specialization (if any)'].tolist())                    
+                                room_dict_2[str(room)].append(df2['HomeTown'].tolist())  
+                            for i in range(-10,11):
+                                
+                                if 'A' in str(room):
+                                    
+                                    neighbour = str(int(str(room)[1:]) + i)
+                                    if  neighbour in  rooms_names_2:
+                                        if len(neighbors_dict_2[str(room)])==0:
+                                            neighbors_dict_2[str(room)].append('A'+neighbour)
+                                            for j in df2['Room No. ']:
+                                                if str(j) == 'B'+neighbour:
+                                                    room_dict_2[str(room)].append(df2['Name'].tolist())
+                                                                                
+                                elif 'B' in str(room):
+                                    neighbour = str(int(str(room)[1:]) + i)
+                                    if  neighbour in  rooms_names_2:
+                                        if len(neighbors_dict_2[str(room)])==0:
+                                            neighbors_dict_2[str(room)].append('B'+neighbour)
+                                            for j in df2['Room No. ']:
+                                                # print(str(j),neighbour)
+                                                if str(j) == 'B'+neighbour:
+                                                    room_dict_2[str(room)].append(df2['Name'].tolist())
+                                                    # print(df2['Name'].tolist())
+                                                    # line()
+                                            
+                                                    
+
+                            
+
     
                 else:
                     listdf1 = df1['Room No. '].tolist()
                     rooms_names_2.append(str(listdf1[n]))
                     if len(room_dict_2[str(room)])==0:
                                 room_dict_2[str(room)].append(df2['Name'].tolist())                    
+                                room_dict_2[str(room)].append(df2['Branch with specialization (if any)'].tolist())                    
+                                room_dict_2[str(room)].append(df2['HomeTown'].tolist())                    
                     
                 n+=1
-            
+        
         case '1':
-            df1 = dataframe.loc[dataframe['Block No.'] == block].head()
+            df1 = dataframe.loc[dataframe['Block No.'] == block]
             n = 0
-            
+            block_1_dict[str(block)].append(df1['Name'].tolist())
             for room in df1['Room No. ']:
-                df2 = df1.loc[df1['Room No. '] == room].head()
+                df2 = df1.loc[df1['Room No. '] == room]
                 
                 if str(room) in rooms_names_1:
                     
@@ -122,6 +132,8 @@ for block in dataframe['Block No.'].tolist():
                         if str(room) == rooms_names_1[length]:
                             if len(room_dict_1[str(room)])==0:
                                 room_dict_1[str(room)].append(df2['Name'].tolist())
+                                room_dict_1[str(room)].append(df2['Branch with specialization (if any)'].tolist())                    
+                                room_dict_1[str(room)].append(df2['HomeTown'].tolist())                    
                                 # print(str(room))
     
                 else:
@@ -129,57 +141,69 @@ for block in dataframe['Block No.'].tolist():
                     rooms_names_1.append(str(listdf1[n]))
                     if len(room_dict_1[str(room)])==0:
                                 room_dict_1[str(room)].append(df2['Name'].tolist())
+                                room_dict_1[str(room)].append(df2['Branch with specialization (if any)'].tolist())                    
+                                room_dict_1[str(room)].append(df2['HomeTown'].tolist()) 
                 n+=1
         case '3':
-            df1 = dataframe.loc[dataframe['Block No.'] == block].head()
+            df1 = dataframe.loc[dataframe['Block No.'] == block]
             n = 0
-
+            block_3_dict[str(block)].append(df1['Name'].tolist())
             for room in df1['Room No. ']:
-                df2 = df1.loc[df1['Room No. '] == room].head()
+                df2 = df1.loc[df1['Room No. '] == room]
                 if str(room) in rooms_names_3:
                     for length in range(len(rooms_names_3)):
                         if str(room) == rooms_names_3[length]:
                             if len(room_dict_3[str(room)])==0:
                                 room_dict_3[str(room)].append(df2['Name'].tolist())
-                                print(str(room))
+                                room_dict_3[str(room)].append(df2['Branch with specialization (if any)'].tolist())                    
+                                room_dict_3[str(room)].append(df2['HomeTown'].tolist()) 
     
                 else:
                     listdf1 = df1['Room No. '].tolist()
                     rooms_names_3.append(str(listdf1[n]))
                     if len(room_dict_3[str(room)])==0:
                                 room_dict_3[str(room)].append(df2['Name'].tolist())
+                                room_dict_3[str(room)].append(df2['Branch with specialization (if any)'].tolist())                    
+                                room_dict_3[str(room)].append(df2['HomeTown'].tolist()) 
                 n+=1
         case '4':
-            df1 = dataframe.loc[dataframe['Block No.'] == block].head()
+            df1 = dataframe.loc[dataframe['Block No.'] == block]
             n = 0
 
             for room in df1['Room No. ']:
-                df2 = df1.loc[df1['Room No. '] == room].head()
+                df2 = df1.loc[df1['Room No. '] == room]
                 if str(room) in rooms_names_4:
                     for length in range(len(rooms_names_4)):
                         if str(room) == rooms_names_4[length]:
                             if len(room_dict_4[str(room)])==0:
                                 room_dict_4[str(room)].append(df2['Name'].tolist())
-                                print(str(room))
+                                room_dict_4[str(room)].append(df2['Branch with specialization (if any)'].tolist())                    
+                                room_dict_4[str(room)].append(df2['HomeTown'].tolist())
     
                 else:
                     listdf1 = df1['Room No. '].tolist()
                     rooms_names_4.append(str(listdf1[n]))
                     if len(room_dict_4[str(room)])==0:
                                 room_dict_4[str(room)].append(df2['Name'].tolist())
+                                room_dict_4[str(room)].append(df2['Branch with specialization (if any)'].tolist())                    
+                                room_dict_4[str(room)].append(df2['HomeTown'].tolist())
                 n+=1
         case _:
             print("Bhai Block 5 Under Construction")
             pass
 
 # print(room_dict_1)
-# data2 = json.loads(json.dumps(room_dict_2))
+data2 = json.loads(json.dumps(room_dict_2))
 # print("room_dict_two: ",data2)
+# data2 = json.loads(json.dumps(neighbors_dict_2))
+# print("room_dict_two: ",data2)
+
 # data1 = json.loads(json.dumps(room_dict_1))
 # print("room_dict_one: ",data1)
-# # print(rooms_names_1)
+# # # print(rooms_names_1)
 # print("room__two:",rooms_names_2)
 # print("room__one:",rooms_names_1)
+# print("room__three:",rooms_names_3)
 
 # If modifying these scopes, delete the file token.json.
 SCOPES = ['https://www.googleapis.com/auth/gmail.send']
@@ -267,57 +291,92 @@ for email in dataframe['Email Address'].tolist():
 
     
 
-    df2 = dataframe.loc[dataframe['Email Address'] == email].head()
+    df2 = dataframe.loc[dataframe['Email Address'] == email]
+    # print(email)
     blklist = df2['Block No.'].tolist()
     blockno = ''.join([str(element) for element in blklist]) 
-    # print(blockno)
-    if blockno == '2':
-        roomlist = df2['Room No. '].tolist()
+    
+    match str(blockno):
+        case '2':
+            roomlist = df2['Room No. '].tolist()
+            # print(roomlist)
+            roomno = ''.join([str(element) for element in roomlist]) 
+            # print(room_dict_2[roomno])
+        # print(str(email))
+
+            sender = "quilo.bikcodes@gmail.com"
+            context = f"Room: {roomno} \nBlock {blockno} \nSo these are your roommates:"
+            loop = 0
+            for i in room_dict_2[roomno][0]:
+                j = room_dict_2[roomno][1][loop]
+                k = room_dict_2[roomno][2][loop]
+                context = context + "\n\n\n" + i +" studying in the branch of  " +j + " from " + k
+                loop += 1 
+            context = context + "\n\n\n" + f"These are the hostel mates of your block 2: \n"
+            for name in block_2_dict['2'][0]:
+                context = context + "\n"+ name
+            context = context + "\n\nThanks for filling the G Forms\n\n\n\nFrom the developer \nI am Bikramjeet Dasgupta \nCSE \nAI ML \nFresher\nBlock 1\nRoom No.: 548\nI shall be adding neighbours also from the next mail. If You dont get a room mate no worries...The sample size is only 140 so ya It is quite often to happen I would rather say that matched roommates will be rare."
+            print(context)
+            subject = f'Hey Mate of Room {roomno}. Here are your roommates'
+            msg = create_message(email, context , subject )
+            send_message(service, 'me', msg)
+            
+                  
+            
+                   
+            
+        case '1':
+            roomlist = df2['Room No. '].tolist()
+            
+            roomno = ''.join([str(element) for element in roomlist]) 
+            # print(room_dict_2[roomno])
+        # print(str(email))
+
+            sender = "quilo.bikcodes@gmail.com"
+            context = f"Room: {roomno} \nBlock {blockno} \nSo these are your roommates:"
+            loop = 0
+            for i in room_dict_1[roomno][0]:
+                j = room_dict_1[roomno][1][loop]
+                k = room_dict_1[roomno][2][loop]
+                context = context + "\n" + i +" studying in the branch of  " +j + " from " + k
+                loop += 1 
+            context = context + "\n\n\n" + f"These are the hostel mates of your block 1: \n"
+            for name in block_1_dict['1'][0]:
+                context = context + "\n"+ name
+            context = context + "\n\nThanks for filling the G Forms\n\n\n\nFrom the developer \nI am Bikramjeet Dasgupta \nCSE \nAI ML \nFresher\nBlock 1\nRoom No.: 548\nI shall be adding neighbours also from the next mail. If You dont get a room mate no worries...The sample size is only 140 so ya It is quite often to happen I would rather say that matched roommates will be rare."
+            print(context)
+            subject = f'Hey Mate of Room {roomno}. Here are your roommates'
+            msg = create_message(email, context , subject )
+            send_message(service, 'me', msg)  
         
-        roomno = ''.join([str(element) for element in roomlist]) 
-        # print(room_dict_2[roomno])
-    # print(str(email))
+        case '3':
 
-        sender = "quilo.bikcodes@gmail.com"
-        context = "So these are your roommates:"
-        for i in room_dict_2[roomno][0]:
-            context = context + "\n" + i
-        context = context + "\n\nThanks for filling the G Forms\n\n\n\nFrom the operator \nI am Bikramjeet Dasgupta \nCSE \nAI ML \nFresher\n"
-        print(context)
-        subject = f'Hey Mate of Room {roomno}. Here are your roommates'
-        msg = create_message(sender, context , subject )
-        # send_message(service, 'me', msg)        
-        break
-        # msg = EmailMessage()
-        # content = room_dict_2[roomno][0]
-        # msg.set_content("Hello from Bikram")
+            roomlist = df2['Room No. '].tolist()
+            
+            roomno = ''.join([str(element) for element in roomlist]) 
+            # print(room_dict_2[roomno])
+        # print(str(email))
 
-        # me = "bikramjeetdasgupta@yahoo.com"
-        # you = "quilo.bikcodes@gmail.com"
-        # msg['Subject'] = f'Hey Mate of Room{roomno}. Here are your roommates'
-        # msg['From'] = me
-        # msg['To'] = you
-
-        # # s = smtplib.SMTP('smtp.zoho.com', 465)
-
-        # load_dotenv(".env")
-
-        # SENDER = os.environ.get("GMAIL_USER")
-        # PASSWORD = os.environ.get("GMAIL_PASSWORD")
-        # # s.ehlo()
-        # # s.starttls()
-        # # s.ehlo()
-        # # s = smtplib.SMTP_SSL("smtp.gmail.com", 587)
-        # session = smtplib.SMTP_SSL('smtp.zoho.com', 465)
-        # # session.starttls()
-        # session.login("bikramjeetdg@zohomail.in", "Babi1234")
-
-        # session.sendmail(me, you, msg)
-        # session.close()
-        # # s.login(SENDER,PASSWORD)
-        # # s.sendmail(SENDER, you,msg)
-        # # # s.send_message(msg)
-        # # s.quit()
+            sender = "quilo.bikcodes@gmail.com"
+            context = f"Room: {roomno} \nBlock {blockno} \nSo these are your roommates:"
+            loop = 0
+            for i in room_dict_3[roomno][0]:
+                j = room_dict_3[roomno][1][loop]
+                k = room_dict_3[roomno][2][loop]
+                context = context + "\n" + i +" studying in the branch of  " +j + " from " + k
+                loop += 1 
+            context = context + "\n\n\n" + f"These are the hostel mates of your block 3: \n"
+            for name in block_3_dict['3'][0]:
+                context = context + "\n"+ name
+            context = context + "\n\nThanks for filling the G Forms\n\n\n\nFrom the developer \nI am Bikramjeet Dasgupta \nCSE \nAI ML \nFresher\nBlock 1\nRoom No.: 548\nI shall be adding neighbours also from the next mail. If You dont get a room mate no worries...The sample size is only 140 so ya It is quite often to happen I would rather say that matched roommates will be rare."
+            print(context)
+            subject = f'Hey Mate of Room {roomno}. Here are your roommates'
+            msg = create_message(email, context , subject )
+            send_message(service, 'me', msg)  
         
-# https://docs.google.com/spreadsheets/d/1UCbxwVUZFdHyMQyqlNhPsJe8RJkJTvsa2v8pFXI4wpE/edit?usp=sharing
-# G6Mu*QG6FzYd9*a
+
+
+    line()
+    sleep(0.2)
+
+
