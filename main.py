@@ -126,51 +126,42 @@ for block in dataframe['Block No.'].tolist():
                                     for i in range(-10,11):
                                         
                                         neighbour = str(int(str(room)[1:]) + i)
-                                        if  neighbour in  rooms_names_2:
-                                            if len(neighbors_dict_2[str(room)])==0:
-                                                neighbors_dict_2[str(room)].append('A'+neighbour)
-                                                for j in df2['Room No. ']:
-                                                    if str(j) == 'B'+neighbour:
-                                                        room_dict_2[str(room)].append(df2['Name'].tolist())
+                                        if 'A'+str(neighbour) != str(room):
+                                
+                                    
+                                            if 'A'+str(neighbour) in rooms_names_2:
+                                                # print("Neighbout Found") 
+                                                df3 = df1.loc[df1['Room No. '].astype(str) == 'A'+str(neighbour)]
+                                                # print(df3)
+                                                if len(df3) > 0:
+                                                    try:
+                                                        if len(room_dict_2[str(room)][4])==0:
+                                                            room_dict_2[str(room)].append(df3['Name'].tolist())
+                                                            room_dict_2[str(room)].append(df3['Room No. '].tolist())
+                                                    except:
+                                                        room_dict_2[str(room)].append(df3['Name'].tolist())
+                                                        room_dict_2[str(room)].append(df3['Room No. '].tolist())
                                                                                     
                                 elif 'B' in str(room):
                                     for i in range(-10,11):
+                                        
                                         neighbour = str(int(str(room)[1:]) + i)
-                                        if  neighbour in  rooms_names_2:
-                                            if len(neighbors_dict_2[str(room)])==0:
-                                                neighbors_dict_2[str(room)].append('B'+neighbour)
-                                                for j in df2['Room No. ']:
-                                                    # print(type(df2['Room No. ']),'B'+neighbour)
-                                                    if str(j) != 'B'+neighbour:
-                                                        df3 = df2.loc[df2['Room No. '] == 'B'+neighbour]
-                                                        # print(df3)
-                                                        room_dict_2[str(room)].append(df2['Name'].tolist())
-                                                        # print(df2['Name'].tolist())
-                                                        # line()
-                                    
-                                
-                                
-                                
-                                
-                                
-                                
-                                
-                                # if str(neighbour) != str(room):
+                                        if 'B'+str(neighbour) != str(room):
                                 
                                     
-                                #     if neighbour in rooms_names_1:
-                                #         # print("Neighbout Found") 
-                                #         df3 = df1.loc[df1['Room No. '].astype(str) == str(neighbour)]
-                                #         # print(df3)
-                                #         if len(df3) > 0:
-                                #             try:
-                                #                 if len(room_dict_1[str(room)][4])==0:
-                                #                     room_dict_1[str(room)].append(df3['Name'].tolist())
-                                #                     room_dict_1[str(room)].append(df3['Room No. '].tolist())
-                                #             except:
-                                #                 room_dict_1[str(room)].append(df3['Name'].tolist())
-                                #                 room_dict_1[str(room)].append(df3['Room No. '].tolist())                    
-            
+                                            if 'B'+str(neighbour) in rooms_names_2:
+                                                # print("Neighbout Found") 
+                                                df3 = df1.loc[df1['Room No. '].astype(str) == 'B'+str(neighbour)]
+                                                # print(df3)
+                                                if len(df3) > 0:
+                                                    try:
+                                                        if len(room_dict_2[str(room)][4])==0:
+                                                            room_dict_2[str(room)].append(df3['Name'].tolist())
+                                                            room_dict_2[str(room)].append(df3['Room No. '].tolist())
+                                                    except:
+                                                        room_dict_2[str(room)].append(df3['Name'].tolist())
+                                                        room_dict_2[str(room)].append(df3['Room No. '].tolist())
+                                    
                 n+=1
         
         case '1':
@@ -195,7 +186,7 @@ for block in dataframe['Block No.'].tolist():
                                     print(neighbour)
                                     if  neighbour in rooms_names_1:
                                         df3 = df2.loc[df2['Block No.'].astype(str).str == neighbour]
-                                        print(df3)
+                                        # print(df3)
 
 
     
@@ -257,6 +248,45 @@ for block in dataframe['Block No.'].tolist():
                                 room_dict_3[str(room)].append(df2['Name'].tolist())
                                 room_dict_3[str(room)].append(df2['Branch with specialization (if any)'].tolist())                    
                                 room_dict_3[str(room)].append(df2['HomeTown'].tolist()) 
+                                if 'A' in str(room):
+                                    for i in range(-10,11):
+                                        
+                                        neighbour = str(int(str(room)[1:]) + i)
+                                        if 'A'+str(neighbour) == str(room):
+                                
+                                    
+                                            if 'A'+str(neighbour) in rooms_names_3:
+                                                print("Neighbout Found") 
+                                                df3 = df1.loc[df1['Room No. '].astype(str) == 'A'+str(neighbour)]
+                                                # print(df3)
+                                                if len(df3) > 0:
+                                                    try:
+                                                        if len(room_dict_3[str(room)][4])==0:
+                                                            room_dict_3[str(room)].append(df3['Name'].tolist())
+                                                            room_dict_3[str(room)].append(df3['Room No. '].tolist())
+                                                    except:
+                                                        room_dict_3[str(room)].append(df3['Name'].tolist())
+                                                        room_dict_3[str(room)].append(df3['Room No. '].tolist())
+                                                                                    
+                                elif 'B' in str(room):
+                                    for i in range(-10,11):
+                                        
+                                        neighbour = str(int(str(room)[1:]) + i)
+                                        if 'B'+str(neighbour) != str(room):
+                                
+                                    
+                                            if 'B'+str(neighbour) in rooms_names_3:
+                                                print("Neighbout Found") 
+                                                df3 = df1.loc[df1['Room No. '].astype(str) == 'B'+str(neighbour)]
+                                                print(df3)
+                                                if len(df3) > 0:
+                                                    try:
+                                                        if len(room_dict_3[str(room)][4])==0:
+                                                            room_dict_3[str(room)].append(df3['Name'].tolist())
+                                                            room_dict_3[str(room)].append(df3['Room No. '].tolist())
+                                                    except:
+                                                        room_dict_3[str(room)].append(df3['Name'].tolist())
+                                                        room_dict_3[str(room)].append(df3['Room No. '].tolist())
     
                 else:
                     listdf1 = df1['Room No. '].tolist()
@@ -400,22 +430,42 @@ for email in dataframe['Email Address'].tolist():
         case '2':
             roomlist = df2['Room No. '].tolist()
             # print(roomlist)
-            roomno = ''.join([str(element) for element in roomlist]) 
+            roomno = ''.join([str(element) for element in roomlist])
+            # print(roomno) 
             # print(room_dict_2[roomno])
         # print(str(email))
 
             sender = "quilo.bikcodes@gmail.com"
             context = f"Room: {roomno} \nBlock {blockno} \nSo these are your roommates:"
             loop = 0
-            if len(room_dict_2[roomno][0]) > 1:
+            if len(room_dict_2[roomno][0]) > 1 or len(room_dict_2[roomno])>3:
+
                 for i in room_dict_2[roomno][0]:
-                    j = room_dict_2[roomno][1][loop]
-                    k = room_dict_2[roomno][2][loop]
-                    context = context + "\n\n\n" + str(i) +" studying in the branch of  " + str(j) + " from " + str(k)
-                    loop += 1 
-                context = context + "\n\n\n" + f"These are the hostel mates of your block 2[COMMON BLOCK LIST]: \n"
-                for name in block_2_dict['2'][0]:
-                    context = context + "\n"+ name
+                    
+                        j = room_dict_2[roomno][1][loop]
+                        k = room_dict_2[roomno][2][loop]
+                        # l = room_dict_1[roomno][3][loop]
+                        # m = room_dict_1[roomno][4][loop]
+                        context = context + "\n" + str(i) +" studying in the branch of  " +str(j) + " from " + str(k)
+                        
+                        loop += 1
+            
+                
+                context += "\n\n\n\n\nThese are your neighbours (Criteria : 10 rooms left and 10 rooms right):\n "
+                for i2 in range(len(room_dict_2)):
+                    try:
+                        
+                        l = room_dict_2[roomno][3][i2]
+                        m = room_dict_2[roomno][4][i2]
+                        context = context + f"\n{l} residing in the room no. {m}"
+                        
+                        
+                    except:
+                        if "\n\nNo other Neighbour found" not  in context:
+                            context = context + "\n\nNo other Neighbour found"
+                # context = context + "\n\n\n" + f"These are the hostel mates of your block 2[COMMON BLOCK LIST]: \n"
+                # for name in block_2_dict['2'][0]:
+                #     context = context + "\n"+ name
                 context = context + "\n\nThanks for filling the G Forms\n\n\n\nFrom the developer(Not your room mate) \nI am Bikramjeet Dasgupta \nCSE \nAI ML \nFresher\nBlock 1\nRoom No.: 548\n"
                 # print(context)
                 subject = f'Hey Mate of Room {roomno}. Here are your roommates'
@@ -437,7 +487,7 @@ for email in dataframe['Email Address'].tolist():
             sender = "quilo.bikcodes@gmail.com"
             context = f"Room: {roomno} \nBlock {blockno} \nSo these are your roommates:"
             loop = 0
-            if len(room_dict_1[roomno][0]) > 1:
+            if len(room_dict_1[roomno][0]) > 1 or len(room_dict_1[roomno])>3:
 
                 for i in room_dict_1[roomno][0]:
                     
@@ -450,7 +500,7 @@ for email in dataframe['Email Address'].tolist():
                         loop += 1
             
                 
-                context += "\n\n\n\n\nThese are your neighbours: "
+                context += "\n\n\n\n\nThese are your neighbours(Criteria : 10 rooms left and 10 rooms right):\n "
                 for i2 in range(len(room_dict_1)):
                     try:
                         
@@ -483,21 +533,41 @@ for email in dataframe['Email Address'].tolist():
             sender = "quilo.bikcodes@gmail.com"
             context = f"Room: {roomno} \nBlock {blockno} \nSo these are your roommates:"
             loop = 0
-            if len(room_dict_3[roomno][0]) > 1:
+            if  len(room_dict_3[roomno])>3:
+
                 for i in room_dict_3[roomno][0]:
-                    j = room_dict_3[roomno][1][loop]
-                    k = room_dict_3[roomno][2][loop]
-                    context = context + "\n" + str(i) +" studying in the branch of  " +str(j) + " from " + str(k)
-                    loop += 1 
-                context = context + "\n\n\n" + f"These are the hostel mates of your block 3[COMMON BLOCK LIST]: \n"
-                for name in block_3_dict['3'][0]:
-                    context = context + "\n"+ name
+                    
+                        j = room_dict_3[roomno][1][loop]
+                        k = room_dict_3[roomno][2][loop]
+                        # l = room_dict_1[roomno][3][loop]
+                        # m = room_dict_1[roomno][4][loop]
+                        context = context + "\n" + str(i) +" studying in the branch of  " +str(j) + " from " + str(k)
+                        
+                        loop += 1
+            
+                
+                context += "\n\n\n\n\nThese are your neighbours (Criteria : 10 rooms left and 10 rooms right):\n "
+                for i2 in range(len(room_dict_3)):
+                    try:
+                        
+                        l = room_dict_3[roomno][3][i2]
+                        m = room_dict_3[roomno][4][i2]
+                        context = context + f"\n{l} residing in the room no. {m}"
+                        
+                        
+                    except:
+                        if "\n\nNo other Neighbour found" not  in context:
+                            context = context + "\n\nNo other Neighbour found"
+                
+                # context = context + "\n\n\n" + f"These are the hostel mates of your block 3[COMMON BLOCK LIST]: \n"
+                # for name in block_3_dict['3'][0]:
+                #     context = context + "\n"+ name
                 context = context + "\n\nThanks for filling the G Forms\n\n\n\nFrom the developer(Not your room mate) \nI am Bikramjeet Dasgupta \nCSE \nAI ML \nFresher\nBlock 1\nRoom No.: 548\n"
-                # print(context)
+                print(context)
                 subject = f'Hey Mate of Room {roomno}. Here are your roommates'
                 # msg = create_message(email, context , subject )
                 # send_message(service, 'me', msg)  
-                # line()
+                line()
             
 
 
